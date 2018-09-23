@@ -2,7 +2,7 @@ import smart_open
 from preprocess.filetokenizer import readRows
 
 def main():
-    rows, labels = readRows("./data/train_drugs.data", loadFile=False, isTrainingFile=True)
+    trainingRows, labels = readRows("./data/train_drugs.data", loadFile=False, isTrainingFile=True)
     testRows, _ = readRows("./data/test_drugs.data", loadFile=False, isTrainingFile=False)
     
     print('Molecule activity successfully written to predictions.data')
