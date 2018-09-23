@@ -39,17 +39,17 @@ def tokenizeReviews(fileName, isTrainingFile=False):
     return - tokenized rows a generator
 """
 def readRows(fileName, loadFile=False, isTrainingFile=False):
-    tokenFile = renameFileExtension(fileName+'_rows', 'data', 'pkl')
-    labelFile = renameFileExtension(fileName+'_labels', 'data', 'pkl')
+    tokenFile = renameFileExtension(fileName, 'data', 'tokens')
+    labelFile = renameFileExtension(fileName, 'data', 'labels')
     tokens, labels = [], []
     if(loadFile):
-        # deserialize objects if .pkl file already exists
+        # deserialize objects if pickled file already exists
         with smart_open.smart_open(tokenFile, "rb") as f:
             tokens = pickle.load(f, encoding="utf-8")
         with smart_open.smart_open(labelFile, "rb") as f: 
             labels = pickle.load(f, encoding="utf-8")
     else:
-        # serialize and pickle the objects to files with .pkl extension
+        # serialize and pickle the objects to files with pickled extension
         tokens, labels = tokenizeReviews(fileName, isTrainingFile) 
         serializeObject(tokenFile, tokens)
         serializeObject(labelFile, labels)
