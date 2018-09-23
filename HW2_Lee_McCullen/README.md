@@ -9,9 +9,9 @@ Make sure you are using Python 3.6 to run this project.
 Ensure `train.data` and `test.data` files are placed in the `/src/data`  directory before running the program.
 
 # Running the Program
-In the `/src` directory, the only file you need to run is `________________.py`.
+In the `/src` directory, the only file you need to run is `moleculeclassifier.py`.
 
-`python3 ____________________.py`
+`python3 moleculeclassifier.py`
 
 # Results
 The sentiment predictions will be written to `predicitions.data` located in `/src/data`.
