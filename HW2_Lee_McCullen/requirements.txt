@@ -18,5 +18,7 @@ smart_open == 1.6.0
 
 # gensim (doc2vec implementation)
 gensim == 3.5.0
-
 h5py == 2.8.0
+
+# matlab plot
+matplotlib == 3.0.0

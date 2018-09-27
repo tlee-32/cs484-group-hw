@@ -25,7 +25,8 @@ def tokenizeReviews(fileName, isTrainingFile=False):
         label, row = splitLabelledRow(row)
         tokenizedRow = word_tokenize(row)
         # label training documents
-        if isTrainingFile: labels.append(label)
+        if isTrainingFile: labels.append(float(label))
+        tokenizedRow = [float(item) for item in tokenizedRow]
         tokens.append(tokenizedRow)
     
     return tokens, labels
