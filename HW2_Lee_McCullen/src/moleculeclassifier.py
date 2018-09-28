@@ -9,8 +9,11 @@ from sklearn.pipeline import Pipeline
 from scipy.sparse import csr_matrix
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 def main():
+    startTime = time.time()
+
     trainingRows, labels = readRows("./data/train_drugs.data", loadFile=True, isTrainingFile=True)
     testRows, _ = readRows("./data/test_drugs.data", loadFile=True, isTrainingFile=False)
     lengths = [len(r) for r in trainingRows]
@@ -82,7 +85,7 @@ def main():
     for tup in solverScores[::-1]:
         print(tup[0] + ": \t%f" % tup[1])
     
-    print('\nMolecule activity successfully written to predictions.data')
+    print('\nMolecule activity successfully written to predictions.data (%d seconds)' % (time.time() - startTime))
     
 """
     Classifies the active/inactive molecules for test data
