@@ -16,17 +16,17 @@ def logRegCVScore(classifierPipeline, solverMap, sMatrix, labels):
     for penalty, solvers in solverMap.items():
         for s in solvers:
             print("\nSOLVER: " + penalty + " " + s)
-            logReg = LogisticRegression(solver=s, penalty=penalty, max_iter=10000, multi_class='ovr')
+            logReg = LogisticRegression(solver=s, penalty=penalty, max_iter=50000, multi_class='ovr')
 
             # Add classification to pipeline and train it
-            classifierPipeline.steps.append(['classification', logReg])
+            classifierPipeline.steps.append(('classification', logReg))
             classifierPipeline.fit(sMatrix, labels)
             
             # Compute cross-validation scores
             avg = computeCVAverageScore(classifierPipeline, sMatrix, labels)
             
             print("avg score from 5x2 cv: %f\n" % avg)
-            scores.append((penalty + " " + s, avg))
+            scores.append(((s, penalty), avg))
 
             # Reset current logReg classifier for the next solver
             classifierPipeline.steps.pop() 

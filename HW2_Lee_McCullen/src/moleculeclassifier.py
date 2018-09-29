@@ -16,39 +16,66 @@ def main():
     testRows, _ = readRows("./data/test_drugs.data", loadFile=True, isTrainingFile=False)
     
     # Convert data into csr matrix
-    sMatrix = sparsify(trainingRows)
+    sparseTrainingMatrix = sparsify(trainingRows)
+    sparseTestMatrix = sparsify(testRows)
     
     # Define feature-selection estimators
-    featureEstimator = ExtraTreesClassifier(n_estimators=50)
+    featureEstimator = ExtraTreesClassifier(n_estimators=100)
     featureSelectionModel = SelectFromModel(featureEstimator)
 
     # Initialize classifier pipeline with feature selection model
     classifierPipeline = Pipeline([('feature_selection', featureSelectionModel)])
 
-    # newton-cg, lbfgs, and sag ONLY support l2, while all 5 support l1
-    solverMap = {'l1': ['liblinear', 'saga'], 
-                 'l2': ['liblinear', 'newton-cg', 'lbfgs', 'sag', 'saga'] }
+    # Cross-validation that retrieves the optimal solver and penalty parameters
+    #solverParam, penaltyParam = getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels)
+    #print(solverParam)
+    #print(penaltyParam)
+    #return
 
-    # Perform cross validation 
-    solverScores = logRegCVScore(classifierPipeline, solverMap, sMatrix, labels)
+    # Define main classifier
+    logReg = LogisticRegression(solver='saga', penalty='l2', max_iter=10000, multi_class='ovr')
     
-    print("\nFinal scores: ")
-    for tup in solverScores[::-1]:
-        print(tup[0] + ": \t%f" % tup[1])
-    
+    # Finalize and train classifier pipeline 
+    classifierPipeline.steps.append(('classification', logReg))
+    classifierPipeline.fit(sparseTrainingMatrix, labels)
+
+    # Classify and write predictions to file
+    classifyMoleculeActivity(classifierPipeline, sparseTestMatrix)
+
     print('\nMolecule activity successfully written to predictions.data (%d seconds)' % (time.time() - startTime))
-    
+
 """
     Classifies the active/inactive molecules for test data
 """
-def classifyMoleculeActivity(classifier, testRows):
+def classifyMoleculeActivity(classifierPipeline, sparseTestMatrix):
     with smart_open.smart_open("./data/predicitions.data", "w") as f:
-        for row in testRows:
-            label = None # TODO: replace with classifier
-            if(label == '1'):
+        predictions = classifierPipeline.predict(sparseTestMatrix)
+        for prediction in predictions:
+            if(prediction == 1):
                 f.write("1\n")
             else:
                 f.write("0\n")
 
+"""
+    Retrieves the penalty and solver with the highest average.
+"""
+def getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels):
+    # liblinear, and sag ONLY support l1, while all 5 support l2
+    solverMap = {'l1': ['liblinear', 'saga'], 
+                 'l2': ['liblinear', 'newton-cg', 'lbfgs', 'sag', 'saga'] }
+
+    # Perform cross validation 
+    solverScores = logRegCVScore(classifierPipeline, solverMap, sparseTrainingMatrix, labels)
+    
+    print("\nFinal scores: ")
+    for tup in solverScores[::-1]:
+        solverPenalty = tup[0][0] + " " + tup[0][1]
+        score = tup[1]
+        print(solverPenalty + ": \t%f" % score)
+
+    optimalSolver = solverScores[-1][0][0]
+    optimalPenalty = solverScores[-1][0][1]
+    return optimalSolver, optimalPenalty
+    
 if __name__ == '__main__':
     main()
