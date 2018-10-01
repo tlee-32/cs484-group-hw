@@ -1,9 +1,12 @@
 # Library imports
 import smart_open
 import time
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel 
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
 # Custom file imports
 from preprocess.filetokenizer import readRows
 from preprocess.sparsifier import sparsify
@@ -14,26 +17,26 @@ def main():
     # Retrieve data
     trainingRows, labels = readRows("./data/train_drugs.data", loadFile=True, isTrainingFile=True)
     testRows, _ = readRows("./data/test_drugs.data", loadFile=True, isTrainingFile=False)
-    
+
     # Convert data into csr matrix
     sparseTrainingMatrix = sparsify(trainingRows)
     sparseTestMatrix = sparsify(testRows)
     
     # Define feature-selection estimators
-    featureEstimator = ExtraTreesClassifier(n_estimators=100)
+    featureEstimator = RandomForestClassifier(n_estimators=100, n_jobs=2)
     featureSelectionModel = SelectFromModel(featureEstimator)
 
     # Initialize classifier pipeline with feature selection model
     classifierPipeline = Pipeline([('feature_selection', featureSelectionModel)])
 
     # Cross-validation that retrieves the optimal solver and penalty parameters
-    #solverParam, penaltyParam = getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels)
-    #print(solverParam)
-    #print(penaltyParam)
-    #return
+    solverParam, penaltyParam = getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels)
+    print(solverParam)
+    print(penaltyParam)
+    return
 
     # Define main classifier
-    logReg = LogisticRegression(solver='saga', penalty='l2', max_iter=10000, multi_class='ovr')
+    logReg = LogisticRegression(C=1e6, solver='saga', penalty='l2', max_iter=15000, class_weight='balanced', multi_class='ovr', n_jobs=3)
     
     # Finalize and train classifier pipeline 
     classifierPipeline.steps.append(('classification', logReg))

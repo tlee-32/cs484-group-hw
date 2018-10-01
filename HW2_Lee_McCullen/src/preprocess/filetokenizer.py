@@ -47,13 +47,14 @@ def readRows(fileName, loadFile=False, isTrainingFile=False):
         # deserialize objects if pickled file already exists
         with smart_open.smart_open(tokenFile, "rb") as f:
             tokens = pickle.load(f, encoding="utf-8")
-        with smart_open.smart_open(labelFile, "rb") as f: 
-            labels = pickle.load(f, encoding="utf-8")
+        if(isTrainingFile):
+            with smart_open.smart_open(labelFile, "rb") as f: 
+                labels = pickle.load(f, encoding="utf-8")
     else:
         # serialize and pickle the objects to files with pickled extension
         tokens, labels = tokenizeReviews(fileName, isTrainingFile) 
         serializeObject(tokenFile, tokens)
-        serializeObject(labelFile, labels)
+        if(isTrainingFile): serializeObject(labelFile, labels)
         
     return tokens, labels
 
