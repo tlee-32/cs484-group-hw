@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
-
+from sklearn.pipeline import Pipeline
 """
     Perform cross-validation on given selection of l1 and l2 solvers.
 
@@ -16,10 +16,13 @@ def logRegCVScore(classifierPipeline, solverMap, sMatrix, labels):
     for penalty, solvers in solverMap.items():
         for s in solvers:
             print("\nSOLVER: " + penalty + " " + s)
+            s='saga'
+            penalty='l2'
             logReg = LogisticRegression(C=1e6, solver=s, class_weight='balanced', penalty=penalty, max_iter=15000, multi_class='ovr', n_jobs=3)
 
             # Add classification to pipeline and train it
-            classifierPipeline.steps.append(('classification', logReg))
+            #classifierPipeline.steps.append(('classification', logReg))
+            classifierPipeline = Pipeline([('classification', logReg)])
             classifierPipeline.fit(sMatrix, labels)
             
             # Compute cross-validation scores

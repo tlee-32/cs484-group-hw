@@ -16,11 +16,11 @@ In the `/src` directory, the only file you need to run is `moleculeclassifier.py
 # Results
 The sentiment predictions will be written to `predicitions.data` located in `/src/data`.
 
-# Saving and Loading Files `.pkl` `.model`
+# Saving and Loading Files `.pkl`
 A checkpoint is made for each stage of the pipeline:
 Pre-processing -> Feature extraction/representation -> Cross-validation -> kNN classification
 
-Checkpoints mean that data is pickled (saved) as a .pkl or .model file. In `sentimentclassifier.py`, the condition
+Checkpoints mean that data is pickled (saved) as a .pkl or .model file. In `moleculeclassifier.py`, the condition
 `loadFile = True` if the file has already been saved and the `.pkl` file just needs to be loaded. If `loadFile = False`, then the `.data` file will be read and saved as a `.pkl` file.
 
 # `/data` Directory and Subdirectories

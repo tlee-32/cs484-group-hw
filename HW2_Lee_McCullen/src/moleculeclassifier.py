@@ -1,7 +1,6 @@
 # Library imports
 import smart_open
 import time
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import cross_val_score
@@ -30,10 +29,10 @@ def main():
     classifierPipeline = Pipeline([('feature_selection', featureSelectionModel)])
 
     # Cross-validation that retrieves the optimal solver and penalty parameters
-    solverParam, penaltyParam = getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels)
-    print(solverParam)
-    print(penaltyParam)
-    return
+    #solverParam, penaltyParam = getOptimalCVParameters(classifierPipeline, sparseTrainingMatrix, labels)
+    #print(solverParam)
+    #print(penaltyParam)
+    #return
 
     # Define main classifier
     logReg = LogisticRegression(C=1e6, solver='saga', penalty='l2', max_iter=15000, class_weight='balanced', multi_class='ovr', n_jobs=3)
