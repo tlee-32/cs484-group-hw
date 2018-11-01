@@ -1,0 +1,27 @@
+# Python (3.6.5)
+numpy==1.15.1
+
+# NLP
+nltk==3.3
+sudo python3 -m nltk.downloader -d /usr/local/share/nltk_data stopwords
+sudo python3 -m nltk.downloader -d /usr/local/share/nltk_data punkt
+
+# SCIKIT
+scipy == 1.1.0
+scikit-learn == 0.19.2
+
+# Surprise
+scikit-surprise == 1.0.6
+
+# six
+six == 1.11.0
+
+# smart_open (file streaming)
+smart_open == 1.6.0
+
+# matlab plot
+matplotlib == 3.0.0
+
+# xgboost
+xgboost == 0.80
+

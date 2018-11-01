@@ -16,9 +16,8 @@ six == 1.11.0
 # smart_open (file streaming)
 smart_open == 1.6.0
 
-# gensim (doc2vec implementation)
-gensim == 3.5.0
-h5py == 2.8.0
-
 # matlab plot
 matplotlib == 3.0.0
+
+# xgboost
+xgboost == 0.80

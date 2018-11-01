@@ -6,3 +6,6 @@
 /Report
 .DS_Store
 __pycache__/
+*.ipynb
+.ipynb_checkpoints/
+*checkpoint.py
