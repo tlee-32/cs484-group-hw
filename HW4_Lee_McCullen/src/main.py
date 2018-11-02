@@ -1,6 +1,6 @@
 # Library imports
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import smart_open
 from sklearn.pipeline import Pipeline
 from surprise import SVD, Dataset, Reader
@@ -9,12 +9,15 @@ from time import time
 from crossvalidation.crossvalidation import computeCVAverageRMSE
 from preprocess.fileutil import readFile
 
+
 def main():
   startTime = time()
   print('Pre-processing...')
   # Read train and test data as DataFrames
-  trainData = readFile('./data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
-  testData = readFile('./data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
+  #trainData = readFile('./data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
+  #testData = readFile('./data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
+  trainData = readFile('./src/data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
+  testData = readFile('./src/data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
   
   # Build the train data as a Surprise's DataSet object
   reader = Reader(rating_scale=(0, 5)) # Standardized rating scale 
@@ -39,6 +42,7 @@ def main():
   
   print('\nUser-movie ratings successfully written to predictions.data (%d seconds)' % (time() - startTime))
 
+
 """
   Predicts ratings for each user-movie in test file
 """
@@ -58,12 +62,14 @@ def predictRatings(trainData, testData, predictionAlgorithm):
     predictions.append(roundedPrediction)
 
   return predictions
+
+
 """
   Writes predictions to a file.
 """
 def writePredictions(predictions):
   print('Writing predictions...')
-  with smart_open.smart_open("./data/predicitions.data", "w") as f:
+  with smart_open.smart_open("./src/data/predicitions.data", "w") as f:
     for prediction in predictions:
         s = prediction+"\n"
         f.write(s)
