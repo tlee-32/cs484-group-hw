@@ -1,6 +1,5 @@
 # Library imports
 import numpy as np
-#import pandas as pd
 import smart_open
 from sklearn.pipeline import Pipeline
 from surprise import SVD, Dataset, Reader
@@ -9,26 +8,25 @@ from time import time
 from crossvalidation.crossvalidation import computeCVAverageRMSE
 from preprocess.fileutil import readFile
 
-
 def main():
   startTime = time()
   print('Pre-processing...')
-  # Read train and test data as DataFrames
-  #trainData = readFile('./data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
-  #testData = readFile('./data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
-  trainData = readFile('./src/data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
-  testData = readFile('./src/data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
-  
+  # Read train (shuffled) and test data as DataFrames
+  trainData = readFile('./data/train.data', separator=' ', columns=['userID', 'movieID', 'rating'], types={'userID': np.int32, 'movieID': np.int32, 'rating': np.float32})
+  trainData = trainData.sample(n=len(trainData))
+  testData = readFile('./data/test.data', separator=' ', columns=['userID', 'movieID'], types={'userID': np.int32, 'movieID': np.int32})
+
   # Build the train data as a Surprise's DataSet object
   reader = Reader(rating_scale=(0, 5)) # Standardized rating scale 
   trainData = Dataset.load_from_df(trainData, reader)
   
-  predictionAlgorithm = SVD(n_factors=20, n_epochs=20)
+  predictionAlgorithm = SVD(n_factors=5, n_epochs=50)
 
   """
   # Cross validation for k=5
   avgRMSE = computeCVAverageRMSE(trainData, predictionAlgorithm)
   print(avgRMSE)
+  return
   """
 
   # Build a Trainset object to feed into the prediction algorithm.
@@ -41,7 +39,6 @@ def main():
   writePredictions(predictions)
   
   print('\nUser-movie ratings successfully written to predictions.data (%d seconds)' % (time() - startTime))
-
 
 """
   Predicts ratings for each user-movie in test file
@@ -69,7 +66,7 @@ def predictRatings(trainData, testData, predictionAlgorithm):
 """
 def writePredictions(predictions):
   print('Writing predictions...')
-  with smart_open.smart_open("./src/data/predicitions.data", "w") as f:
+  with smart_open.smart_open("./data/predictions.data", "w") as f:
     for prediction in predictions:
         s = prediction+"\n"
         f.write(s)

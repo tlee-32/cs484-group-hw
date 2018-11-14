@@ -1,3 +1,7 @@
+data
+*.txt
+*.zip
+*.csv
 *.pdf
 *.pkl
 *.model
