@@ -3,10 +3,13 @@ from embedding.wordEmbeddings import createEmbeddingMatrixFromModel, convertGlov
 from preprocess.fileutil import loadCSV, saveDataFrameToCSV
 from preprocess.tokenutil import cleanColumn, tokenizeComments, createPaddedTokens
 from preprocess.preprocess import getVocabSize
+from model.cnn import KerasCNN
 
 EMBEDDING_DIMENSIONS = 25
 MAX_TOKEN_LENGTH = 250
 MAX_WORDS = 200000
+FILTER_WINDOWS = [3,4,5]
+FEATURE_MAP_SIZE = 100
 
 def main():
   startTime = time()
@@ -26,7 +29,8 @@ def main():
   # Load training data
   trainData = loadCSV(cleanedTrainFile, ['id', 'comment_text'])
   trainComments = trainData['comment_text'].tolist()
-
+  trainLabels = loadCSV(trainFile, ['id', 'toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'])
+  
   print('Loading validation data...')
 
 
@@ -38,9 +42,22 @@ def main():
   # Create embedding matrix from the pre-trained word embeddings and train data
   print('Creating embedding matrix...')
   embeddingMatrix = createEmbeddingMatrixFromModel(trainComments, model, MAX_WORDS, EMBEDDING_DIMENSIONS)
+  tokenizedTrainComments = createPaddedTokens(trainComments, MAX_WORDS, MAX_TOKEN_LENGTH)
 
+  print('Instantiating Keras CNN model...')
+
+  print('Keras model successfully instantiated...')
+
+  print('Fitting model...')
   
-  # trainLabels = loadCSV(trainFile, ['id', 'toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'])
+  # cnn = new KerasCNN(FILTER_WINDOWS, FEATURE_MAP_SIZE)
+  # cnn.fit(tokenizedTrainComments, trainLabels.values, ...)
+  # cnn.saveModel('model/cnnModel.h5')
+  # cnn.loadModel('model/cnnModel.h5')
+  
+  # TODO: Create tokenized test comments and predict them
+  # cnn.predict()...
+  
   print('Done! Completed in', time() - startTime, 'seconds')
 
 

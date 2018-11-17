@@ -1,10 +1,13 @@
-from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout, Input
 from keras.layers.embeddings import Embedding
+from keras.callbacks import EarlyStopping
 
-class CNN:
+"""
+  Convolutional Neural Network using Keras
+"""
+class KerasCNN:
   def __init__(self, filterWindows, featureMapSize):
     self.model = None
     # List holding the length of 1D convolution windows
@@ -21,9 +24,10 @@ class CNN:
       input_length = tokenLength)
     return embeddingLayer
 
+  """
+    Build the CNN model with the appropriate parameters
+  """
   def createModel(self, embeddingMatrix, vocabSize, embeddingDimensions, tokenLength):
-    print('Instantiating Keras CNN model...')
-
     ### INPUT LAYER ###
 
     # Embedding layer will expect batches of tokenLength-dimensional vectors
@@ -64,12 +68,15 @@ class CNN:
       metrics=['acc'])
     self.model.summary()
 
-    print('Keras model successfully instantiated...')
-
+  """
+    Train the CNN
+  """
   def fit(self, X, Y, epochs, batchSize):
     if(self.model is None):
       raise Exception("Model is undefined. Call createModel() first before fitting.")
-    print('Fitting model...')
+    # Interrupt training when validation loss stops decreasing.
+    earlyStopping = EarlyStopping(monitor='val_loss', patience=2)
+    # Train model
     self.model.fit(
       x=X, 
       y=Y, 
@@ -78,6 +85,9 @@ class CNN:
       shuffle=True, 
       batch_size=batchSize)
 
+  """
+    Save the CNN model to a file
+  """
   def saveModel(self, outputFile):
     if(self.model is None):
       raise Exception("Undefined models cannot be saved.")
@@ -85,6 +95,9 @@ class CNN:
     self.model.save(outputFile)
     print('Model successfully saved to', outputFile)
 
+  """
+    Load the CNN model from a file
+  """
   def loadModel(self, inputFile):
     print('Loading model...')
     self.model = load_model(inputFile)
