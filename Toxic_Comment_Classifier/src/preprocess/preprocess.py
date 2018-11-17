@@ -8,3 +8,5 @@ def getVocabSize(sentences):
   corpus = set(corpus)
 
   return len(corpus)
+
+  

@@ -1,4 +1,6 @@
 from nltk import word_tokenize
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
 
 # 7740 instances of http
 # 1654 instances of @
@@ -20,3 +22,12 @@ def tokenizeComments(commentColumn):
     result.append(word_tokenize(comment))
   return result
 
+"""
+  Tokenize the data and pad each list of tokens to equal length.
+"""
+def createPaddedTokens(data, maxWords, tokenLength):
+  tokenizer = Tokenizer(num_words=maxWords)
+  tokenizer.fit_on_texts(data)
+  tokens = tokenizer.texts_to_sequences(data)
+  paddedTokens = pad_sequences(tokens, maxlen=tokenLength)
+  return paddedTokens

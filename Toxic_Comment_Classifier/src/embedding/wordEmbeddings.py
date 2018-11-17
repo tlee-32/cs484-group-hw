@@ -23,13 +23,13 @@ def loadWord2VecModel(fileName):
   model = KeyedVectors.load_word2vec_format(fileName)
   return model
 
+
 """
   Create a unique index (dictionary) of all words
 """
 def createWordIndex(data, maxWords):
   tokenizer = Tokenizer(num_words=maxWords)
   tokenizer.fit_on_texts(data)
-  sequences = tokenizer.texts_to_sequences(data)
   return tokenizer.word_index
 
 """
