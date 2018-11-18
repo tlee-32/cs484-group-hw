@@ -1,51 +1,65 @@
 from smart_open import smart_open
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, KeyedVectors
+from gensim.scripts.glove2word2vec import glove2word2vec
+from keras.preprocessing.text import Tokenizer
 from nltk.tokenize import word_tokenize
-import bcolz
 import pandas as pd
 import pickle
 import numpy as np
 
 """
-  Load and save pre-trained embeddings from Glove.
+  Convert the .txt file containing Glove's pre-trained embeddings
+  into a .txt file that is readable by Word2Vec.
 """
-def processPretrainedEmbeddings(fileName):
-  print("Loading", fileName, "Embeddings")
-  idx = 0
-  words = []
-  wordToIdx = {}
-  embeddings = bcolz.carray(np.zeros(1), rootdir=fileName+'.dat', mode='w')
-
-  # Load embeddings
-  with smart_open(fileName+'.txt', 'rb') as f:
-      for l in f:
-          line = l.decode().split()
-          word = line[0]
-          words.append(word)
-          wordToIdx[word] = idx
-          idx += 1
-          vector = np.array(line[1:]).astype(np.float)
-          embeddings.append(vector)
-      
-  # Save embeddings to disk
-  shape = (-1, 50) # 400K tokens and 50 dimensions
-  embeddings = bcolz.carray(embeddings[1:].reshape(shape), rootdir=fileName+'.dat', mode='w')
-  embeddings.flush()
-  # Save pre-trained corpus
-  pickle.dump(words, smart_open(fileName+'_words.pkl', 'wb'))
-  pickle.dump(wordToIdx, smart_open(fileName+'_idx.pkl', 'wb'))
-  print('Completed processing ', fileName+'.txt')
+def convertGloveToWord2VecModel(gloveFileName, outputFileName):
+  print("Converting", gloveFileName, "Embeddings to Word2Vec...")
+  try:
+    glove2word2vec(gloveFileName, outputFileName)
+  except OSError:
+    print(gloveFileName, 'does not exist. Please download from https://nlp.stanford.edu/projects/glove/')
+  print('Word2Vec model saved in', outputFileName)
 
 """
-  Loads the embeddings from the files.
+  Load Word2Vec model.
 """
-def loadSavedEmbeddings(fileName):
-  embeddings = bcolz.open(fileName+'.dat')[:]
-  words = pickle.load(smart_open(fileName+'_words.pkl', 'rb'))
-  wordToIdx = pickle.load(smart_open(fileName+'_idx.pkl', 'rb'))
+def loadWord2VecModel(fileName):
+  model = KeyedVectors.load_word2vec_format(fileName)
+  return model
 
-  glove = {word: embeddings[wordToIdx[word]] for word in words}
-  return glove
+"""
+  Create a unique index (dictionary) of all words
+"""
+def createWordIndex(data, maxWords):
+  tokenizer = Tokenizer(num_words=maxWords)
+  tokenizer.fit_on_texts(data)
+  return tokenizer.word_index
+
+"""
+  Create embedding matrix from pre-trained word embedding model.
+  Currently using pre-trained Glove embeddings of Tweets
+"""
+def createEmbeddingMatrixFromModel(data, model, maxWords, embeddingDimensions):
+  wordIndex = createWordIndex(data, maxWords)
+  # Keep the top N words in our vocab
+  vocabSize = min(len(wordIndex)+1, maxWords)
+  # Initialize embedding matrix
+  embeddingMatrixShape = (vocabSize, embeddingDimensions)
+  embeddingMatrix = np.zeros(embeddingMatrixShape)
+
+  # Create embedding matrix
+  for word, idx in wordIndex.items():
+    if idx >= maxWords:
+      continue
+    try:
+      vector = model[word]
+      embeddingMatrix[idx] = vector
+    except KeyError:
+      # Handle unknown word vectors by giving it a random value
+      vector = np.random.rand(embeddingDimensions)
+      embeddingMatrix[idx] = vector
+
+  print(embeddingMatrix.shape)
+  return embeddingMatrix
 
 """
   Creates word embeddings (Word2Vec) from scratch given a corpus.
@@ -66,9 +80,8 @@ def createEmbeddingsFromCorpus(fileName):
 
   #Summarize vocab
   words = list(model.wv.vocab)
-  print(words)
-  print(model)
 
+  return model
   #Save model for later use
   #model.save('wordModel.bin')
 
