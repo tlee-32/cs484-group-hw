@@ -3,6 +3,7 @@ from keras.models import Model, load_model
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout, Input
 from keras.layers.embeddings import Embedding
 from keras.callbacks import EarlyStopping
+from .metrics import auc_roc
 
 """
   Convolutional Neural Network using Keras
@@ -50,14 +51,15 @@ class KerasCNN:
   
     ### FULLY CONNECTED LAYER ###
 
+    # Flatten output into 1D feature vector
+    flattenLayer = Flatten()(poolingLayer)
+    
     # Regularization layer to prevent overfitting
-    dropoutLayer = Dropout(rate=0.5)(poolingLayer)
+    dropoutLayer = Dropout(rate=0.5)(flattenLayer)
 
     ### OUTPUT LAYER ###
 
-    # Flatten output into 1D feature vector
-    flattenLayer = Flatten()(dropoutLayer)
-    outputLayer = Dense(6, activation='sigmoid')(flattenLayer)
+    outputLayer = Dense(6, activation='sigmoid')(dropoutLayer)
 
     ### CREATE MODEL ###
 
@@ -65,7 +67,7 @@ class KerasCNN:
     self.model.compile(
       loss='categorical_crossentropy',
       optimizer='adam',
-      metrics=['acc'])
+      metrics=['acc', auc_roc])
     self.model.summary()
 
   """
@@ -75,7 +77,7 @@ class KerasCNN:
     if(self.model is None):
       raise Exception("Model is undefined. Call createModel() first before fitting.")
     # Interrupt training when validation loss stops decreasing.
-    earlyStopping = EarlyStopping(monitor='val_loss', patience=2)
+    earlyStopping = EarlyStopping(monitor='auc_roc', patience=2)
     # Train model
     self.model.fit(
       x=X, 
@@ -83,7 +85,8 @@ class KerasCNN:
       epochs=epochs, 
       validation_split=0.2, 
       shuffle=True, 
-      batch_size=batchSize)
+      batch_size=batchSize,
+      callbacks=[earlyStopping])
 
   """
     Save the CNN model to a file
@@ -100,5 +103,6 @@ class KerasCNN:
   """
   def loadModel(self, inputFile):
     print('Loading model...')
-    self.model = load_model(inputFile)
+    # Keras doesn't save custom loss functions so we have to define it
+    self.model = load_model(inputFile, custom_objects={'auc_roc': auc_roc})
     print(inputFile, 'model loaded...')

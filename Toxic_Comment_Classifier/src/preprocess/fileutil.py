@@ -1,4 +1,5 @@
 import pandas as pd
+import os.path
 
 """
   Read structured file into a DataFrame.
@@ -9,3 +10,6 @@ def loadCSV(file, columns):
 
 def saveDataFrameToCSV(file, df):
   df.to_csv(file)
+
+def fileExists(file):
+  return os.path.exists(file)

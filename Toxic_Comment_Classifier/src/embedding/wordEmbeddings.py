@@ -12,8 +12,11 @@ import numpy as np
   into a .txt file that is readable by Word2Vec.
 """
 def convertGloveToWord2VecModel(gloveFileName, outputFileName):
-  print("Converting", gloveFileName, "Embeddings to Word2Vec")
-  glove2word2vec(gloveFileName, outputFileName)
+  print("Converting", gloveFileName, "Embeddings to Word2Vec...")
+  try:
+    glove2word2vec(gloveFileName, outputFileName)
+  except OSError:
+    print(gloveFileName, 'does not exist. Please download from https://nlp.stanford.edu/projects/glove/')
   print('Word2Vec model saved in', outputFileName)
 
 """
@@ -22,7 +25,6 @@ def convertGloveToWord2VecModel(gloveFileName, outputFileName):
 def loadWord2VecModel(fileName):
   model = KeyedVectors.load_word2vec_format(fileName)
   return model
-
 
 """
   Create a unique index (dictionary) of all words
