@@ -16,6 +16,16 @@ class KerasCNN:
     self.model = None
   
   """
+    Create embedding layer from scratch
+  """
+  def createEmbeddingLayer(self, vocabSize, embeddingDimensions, tokenLength):
+    embeddingLayer = Embedding(
+      input_dim = vocabSize, 
+      output_dim = embeddingDimensions,
+      input_length = tokenLength)
+    return embeddingLayer
+
+  """
     Create embedding layer from pre-trained vectors
   """
   def createPreTrainedEmbeddingLayer(self, embeddingMatrix, vocabSize, embeddingDimensions, tokenLength):
@@ -51,11 +61,11 @@ class KerasCNN:
 
     # mergedConvolutions = concatenate(convolutions, axis=1)
 
-    # Convolution layer with a 3-window convolution/filter
+    # Convolution layer with 128-filters of size 4 each
     convolutionLayer = Conv1D(
-      filters=128,
-      padding='same',
-      kernel_size=4,
+      filters=128, # 
+      padding='same', # pads so that input is same size as output
+      kernel_size=4, # size of sliding-window (context window of 4 words OR word embeddings of 4 words)
       activation='relu')(embeddingLayer)
     
     # Max pooling

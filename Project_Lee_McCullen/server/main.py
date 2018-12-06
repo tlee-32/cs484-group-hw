@@ -4,6 +4,7 @@ from predict import predictTestData
 from train import train
 from server import start, loadModel
 from model.cnn import KerasCNN
+from model.lstm import KerasLSTM
 from preprocess.fileutil import loadCSV
 
 MAX_TOKEN_LENGTH = 100
@@ -22,29 +23,31 @@ def main():
     print('--train, --predict, and/or --serve must be specified')
     return
 
-  modelFile = 'model/cnnModel.h5'
-  # modelFile = 'model/weights_base.best.hdf5'
+  cnnModelFile = 'model/cnnModel.h5'
+  lstmModelFile =  'model/lstmModel.h5'
+  modelFile = cnnModelFile
   cleanedTrainFile = 'data/train_cleaned.csv'
+  model = KerasCNN()
   # [-t | --train]
   if(args.train):
     trainFile = 'data/train.csv'
-    gloveFile = 'data/glove.twitter.27B.25d.txt'
-    word2vecFile = 'data/word2vec.twitter.27B.25d.txt'
-    train(trainFile, cleanedTrainFile, gloveFile, word2vecFile, modelFile)
+    gloveFile = 'data/glove.twitter.27B.50d.txt'
+    word2vecFile = 'data/word2vec.twitter.27B.50d.txt'
+    train(model, trainFile, cleanedTrainFile, gloveFile, word2vecFile, modelFile)
 
-  cnn = KerasCNN()
-  cnn.loadModel(modelFile)
+  
+  #model.loadModel(modelFile)
   # [-p | --predict] -- predict excel file
   if(args.predict):
     print('Loading trained model from', modelFile, ' ...')
     testFile = 'data/test.csv'
     cleanedTestFile = 'data/test_cleaned.csv'
-    predictTestData(testFile, cleanedTestFile, cnn)
+    predictTestData(testFile, cleanedTestFile, model)
 
   # [-s | --serve] -- serve/host the model for real-time predictions
   # Tokenizer must already be created. If not, --train must be called.
   if(args.serve):
-    loadModel(cnn, modelFile)
+    loadModel(model, modelFile)
     start()
   print('Done! Completed in', time() - startTime, 'seconds')
 

@@ -6,7 +6,7 @@ from model.cnn import KerasCNN
 
 MAX_TOKEN_LENGTH = 100
 
-def predictTestData(testFile, cleanedTestFile, cnn):
+def predictTestData(testFile, cleanedTestFile, model):
   print('Loading test data...')
   df = ''
   # Load, clean, and save the training data
@@ -20,7 +20,7 @@ def predictTestData(testFile, cleanedTestFile, cnn):
   testComments = df['comment_text'].tolist()
   tokenizedTestComments = createPaddedTokens(testComments, MAX_TOKEN_LENGTH, isTrainingFile=False)
   
-  predictions = cnn.predict(tokenizedTestComments)
+  predictions = model.predict(tokenizedTestComments)
   classNames = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
 
   savePredictions(predictions, df, classNames)

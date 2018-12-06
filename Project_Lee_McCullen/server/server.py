@@ -5,6 +5,7 @@ import tensorflow as tf
 from model.cnn import KerasCNN
 from preprocess.tokenutil import createPaddedTokens, tokenizeText, cleanText
 from preprocess.fileutil import loadTokenizer
+from analysis.plot import plotModel
 
 MAX_TOKEN_LENGTH = 100
 
@@ -17,11 +18,11 @@ def start():
   global app
   app.run()
 
-def loadModel(cnn, modelFile):
+def loadModel(ml, modelFile):
   global model
-  model = cnn
+  model = ml
   model.loadModel(modelFile)
-
+  
   global graph
   graph = tf.get_default_graph()
   
