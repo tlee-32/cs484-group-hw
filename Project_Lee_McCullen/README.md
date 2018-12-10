@@ -42,6 +42,6 @@ pre-trained embeddings file. For example, if GloVe's pre-trained embeddings file
 The predictions will be written to `predicitions.data` located in `/src/data`.
 
 # `/data` Directory and Subdirectories
-Do not delete the`/src/data` directory as it will contain all of the files needed to run the sentiment classifier. Place your training and test data in the `/src/data` directory.
+Do not delete the`/src/data` directory as it will contain all of the files needed to run the toxic classifier. Place your training and test data in the `/src/data` directory.
 
 
