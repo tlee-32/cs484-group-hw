@@ -1,6 +1,6 @@
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
-from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout, Input, concatenate, Bidirectional, GRU, GlobalMaxPool1D
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout, Input, concatenate, Bidirectional, GRU, AveragePooling1D, GlobalMaxPooling1D, GlobalAveragePooling1D
 from keras.layers.embeddings import Embedding
 from keras.callbacks import EarlyStopping
 from .metrics import auc_roc
@@ -61,9 +61,9 @@ class KerasCNN:
 
     # mergedConvolutions = concatenate(convolutions, axis=1)
 
-    # Convolution layer with 128-filters of size 4 each
+    # Convolution layer with 300-filters of size 4 each
     convolutionLayer = Conv1D(
-      filters=128, # 
+      filters=300, # 
       padding='same', # pads so that input is same size as output
       kernel_size=4, # size of sliding-window (context window of 4 words OR word embeddings of 4 words)
       activation='relu')(embeddingLayer)
@@ -78,7 +78,7 @@ class KerasCNN:
     # Flatten output into 1D feature vector
     flattenLayer = Flatten()(dropoutLayerOne)
     
-    denseLayer = Dense(128, activation='relu')(flattenLayer)
+    denseLayer = Dense(300, activation='relu')(flattenLayer)
 
     # Regularization layer to prevent overfitting part 2
     dropoutLayerTwo = Dropout(rate=0.2)(denseLayer)

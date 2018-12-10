@@ -6,7 +6,7 @@ from model.cnn import KerasCNN
 
 MAX_TOKEN_LENGTH = 100
 
-def predictTestData(testFile, cleanedTestFile, model):
+def predictTestData(testFile, cleanedTestFile, model, argsString):
   print('Loading test data...')
   df = ''
   # Load, clean, and save the training data
@@ -23,11 +23,12 @@ def predictTestData(testFile, cleanedTestFile, model):
   predictions = model.predict(tokenizedTestComments)
   classNames = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
 
-  savePredictions(predictions, df, classNames)
+  savePredictions(predictions, df, classNames, argsString)
 
-def savePredictions(predictions, df, classNames):
+def savePredictions(predictions, df, classNames, argsString):
   columns = ['id'] + classNames
   predictionDF = pd.DataFrame(columns=columns)
   predictionDF['id'] = df['id'].tolist() 
   predictionDF[classNames] = predictions
-  saveDataFrameToCSV('./data/predictions.csv', predictionDF)
+    
+  saveDataFrameToCSV('./data/predictions_'+argsString+'.csv', predictionDF)
